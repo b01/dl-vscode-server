@@ -1,87 +1,83 @@
 #!/bin/sh
+
+# Copyright 2023 Khalifah K. Shabazz
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the “Software”),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
 set -e
 
-# You can get the latest commit ID by looking at the latest tagged commit here: https://github.com/microsoft/vscode/releases
-commit_id="08a217c4d27a02a5bcde898fd7981bda5b49391b"
-hash="1618073181175" # This is not required, but I keep it around.
-archive="vscode-server-linux-x64.tar.gz"
-owner='microsoft'
-repo='vscode'
-
-# Get the latest commit sha via command line
+# Auto-Get the latest commit sha via command line.
 get_latest_release() {
-    tag=$(curl --silent "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
-          grep '"tag_name":'                                              | # Get tag line
-          sed -E 's/.*"([^"]+)".*/\1/'                                    ) # Pluck JSON value
+    platform=${1}
+    arch=${2}
 
-    tag_data=$(curl --silent "https://api.github.com/repos/${1}/git/ref/tags/${tag}")
+    # Grab the first commit SHA since as this script assumes it will be the
+    # latest.
+    platform="win32"
+    arch="x64"
+    commit_id=$(curl --silent "https://update.code.visualstudio.com/api/commits/stable/${platform}-${arch}" | sed s'/^\["\([^"]*\).*$/\1/')
 
-    sha=$(echo "${tag_data}"           | # Get latest release from GitHub api
-          grep '"sha":'                | # Get tag line
-          sed -E 's/.*"([^"]+)".*/\1/' ) # Pluck JSON value
-
-    sha_type=$(echo "${tag_data}"           | # Get latest release from GitHub api
-          grep '"type":'                    | # Get tag line
-          sed -E 's/.*"([^"]+)".*/\1/'      ) # Pluck JSON value
-
-    if [ $sha_type != "commit" ]; then
-        combo_sha=$(curl -s "https://api.github.com/repos/${1}/git/tags/${sha}" | # Get latest release from GitHub api
-              grep '"sha":'                                                     | # Get tag line
-              sed -E 's/.*"([^"]+)".*/\1/'                                      ) # Pluck JSON value
-
-        # Remove the tag sha, leaving only the commit sha; this won't work if there are ever more than 2 sha
-        sha=$(echo $combo_sha | sed -E "s/${sha}//")
-    fi
-
-    printf "${sha}"
+    printf "%s" "${commit_id}"
 }
 
-# Get the latest commit sha via command line
-get_latest_release_jq() {
-    tag=$(curl -s "https://api.github.com/repos/${1}/releases/latest" | jq -r '.tag_name')
-    tag_data=$(curl -s "https://api.github.com/repos/${1}/git/ref/tags/${tag}" | jq -r '.object.type,.object.sha')
+PLATFORM="${1}"
+ARCH="${2}"
 
-    # See: https://wiki-dev.bash-hackers.org/syntax/pe#substring_removal
-    sha_type=${tag_data%$'\n'*}
-    sha=${tag_data##*$'\n'}
-
-    if [ "${sha_type}" != "commit" ]; then
-        sha=$(curl -s "https://api.github.com/repos/${1}/git/tags/${sha}" | jq '.object.sha')
-    fi
-
-    printf "${sha}"
-}
-
-# Get the latest commit sha via command line
-get_latest_release_graphql_jq() {
-    sha=$(curl -s -H "Authorization: token $3" \
-        -H  "Content-Type:application/json" \
-        -d '{
-            "query": "{repository(owner:\"'"$1"'\", name:\"'"$2"'\"){latestRelease{tagCommit {oid}}}}"
-        }' https://api.github.com/graphql | jq -r '.data.repository.latestRelease.tagCommit.oid')
-
-    printf "${sha}"
-}
-
-commit_sha=$(get_latest_release "${ownder}/${repo}")
-echo "commit sha = ${commit_sha}"
-
-commit_sha=$(get_latest_release_jq "${ownder}/${repo}")
-echo "commit sha = ${commit_sha}"
-
-if [ -n "${GITHUB_API_TOKEN}" ]; then
-    commit_sha=$(get_latest_release_jq "${ownder}" "${repo}" "${GITHUB_API_TOKEN}")
-    echo "commit sha = ${commit_sha}"
+if [ -z "${PLATFORM}" ]; then
+    echo "please enter a platform, acceptable values are win32, linux, darwin, or alpine"
+    exit 1
 fi
 
-# Download VS Code Server tarball to tmp directory.
-curl -sSL "https://update.code.visualstudio.com/commit:${commit_id}/server-linux-x64/stable" -o "/tmp/${archive}"
+if [ -z "${ARCH}" ]; then
+    U_NAME=$(uname -m)
 
-# Make the parent directory where the server should live. NOTE: Ensure VS Code will have read/write access; namely the user running VScode or container user.
-mkdir -p ~/.vscode-server/bin/${commit_id}_${hash}
+    if [ "${U_NAME}" = "aarch64" ]; then
+        ARCH="arm64"
+    elif [ "${U_NAME}" = "x86_64" ]; then
+        ARCH="x64"
+    elif [ "${U_NAME}" = "armv7l" ]; then
+        ARCH="armhf"
+    fi
+fi
 
-# Extract the tarball to the right location.
-tar --no-same-owner -xz --strip-components=1 -C ~/.vscode-server/bin/${commit_id}_${hash} -f /tmp/${archive}
+commit_sha=$(get_latest_release "${PLATFORM}" "${ARCH}")
 
-# Move the server to the expected location, not sure why we don't just untar it there though.
-mv -n ~/.vscode-server/bin/${commit_id}_${hash} ~/.vscode-server/bin/${commit_id}
+if [ -n "${commit_sha}" ]; then
+    echo "will attempt to download VS Code Server version = '${commit_sha}'"
+
+    prefix="server-${PLATFORM}"
+    if [ "${PLATFORM}" = "alpine" ]; then
+        prefix="cli-${PLATFORM}"
+    fi
+
+    archive="vscode-${prefix}-${ARCH}.tar.gz"
+    # Download VS Code Server tarball to tmp directory.
+    curl -L "https://update.code.visualstudio.com/commit:${commit_sha}/${prefix}-${ARCH}/stable" -o "/tmp/${archive}"
+
+    # Make the parent directory where the server should live.
+    # NOTE: Ensure VS Code will have read/write access; namely the user running VScode or container user.
+    mkdir -vp ~/.vscode-server/bin/"${commit_sha}"
+
+    # Extract the tarball to the right location.
+    tar --no-same-owner -xzv --strip-components=1 -C ~/.vscode-server/bin/"${commit_sha}" -f "/tmp/${archive}"
+    # Add symlink
+    cd ~/.vscode-server/bin && ln -s "${commit_sha}" default_version
+else
+    echo "could not pre install vscode server"
+fi
