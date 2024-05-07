@@ -1,0 +1,17 @@
+services:
+    debian:
+        build:
+            args:
+                USER_NAME: '${USER_NAME}'
+                REPO: '${REPO}'
+            dockerfile: 'test/debian/Dockerfile'
+            context: '../..'
+        image: 'dl-vscode-server-debian'
+        # ports:
+        #     - '32885:32885'
+        volumes:
+          - './:/home/${USER_NAME}/src/${REPO}/test/debian'
+          - 'vscode_ext:/home/${USER_NAME}/.vscode-server/extensions'
+
+volumes:
+   vscode_ext: null

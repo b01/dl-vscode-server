@@ -1,0 +1,135 @@
+version: 2.1
+
+# Anchors
+default-env-vars: &default-env-vars
+  DEV_IMG: "alpine-glibc-build"
+  DOCKER_BUILDKIT: 1
+  AWS_VER: "v2"
+  NODE_VER: "v20.2.0"
+  NODE_DISTRO: "linux-x64"
+  NODE_HOME: "/usr/local/lib/nodejs"
+
+filter-semantic-tag: &filter-semantic-tag
+  tags:
+    only: /^v?\d+\.\d+\.\d+$/
+  branches:
+    ignore: /.*/
+
+remote_worker: &remote_worker
+  setup_remote_docker:
+    version: edge
+    docker_layer_caching: true
+
+orbs:
+  vr: kohirens/version-release@4.0.1
+
+parameters:
+  alpine_version_file:
+    default: alpine-latest-version.txt
+    type: string
+  ctx_auto_release:
+    default: b01-automation
+    description: Release automation context
+    type: string
+  ctx_docker_hub:
+    default: b01-automation-dockerhub
+    description: Docker Hub context
+    type: string
+  ssh_finger:
+    description: SSH fingerprint
+    type: string
+    default: "SHA256:3pwyNuChGDeQkIehoDY41dqHka6EwT6ft13v5KZ02RM"
+  triggered_flow:
+    default: "workflow-selector"
+    description: Workflow to be executed
+    type: string
+
+executors:
+  base:
+    docker: # see https://circleci.com/developer/images/image/cimg/base#how-this-image-works
+      - image: cimg/base:2023.04
+        auth:
+          username: ${DH_USER}
+          password: ${DH_PASS}
+    resource_class: small
+    environment:
+      <<: *default-env-vars
+
+jobs:
+    fetch-code:
+      executor: base
+      steps:
+        - checkout
+        - persist_to_workspace:
+            root: .
+            paths: [ ./* ]
+
+    test-alpine-glibc:
+      executor: base
+      steps:
+        - attach_workspace: { at: "." }
+        - *remote_worker
+        - run:
+            name: "Test with Alpine (GLibC edition)"
+            command: |
+              cd test/alpine
+              DH_IMG=test-alpine-glibc
+              docker build --rm -t "${DH_IMG}" -f ./Dockerfile ../..
+              docker run --rm --entrypoint /home/app/code-server "${DH_IMG}" --version
+              docker rmi "${DH_IMG}"
+
+    test-debian:
+      executor: base
+      steps:
+        - attach_workspace: { at: "." }
+        - *remote_worker
+        - run:
+            name: "Build Alpine glibc against NodeJS"
+            command: |
+              cd test/debian
+              DH_IMG=test-debian
+              docker build --rm -t "${DH_IMG}" -f ./Dockerfile ../..
+              docker run --rm --entrypoint /home/app/code-server "${DH_IMG}" --version
+              docker rmi "${DH_IMG}"
+
+workflows:
+  quality-control:
+    jobs:
+      - fetch-code:
+          context:
+            - << pipeline.parameters.ctx_auto_release >>
+            - << pipeline.parameters.ctx_docker_hub >>
+          filters: { branches: { ignore: /main|auto-update-changelog/ } }
+      - test-alpine-glibc:
+          context: << pipeline.parameters.ctx_auto_release >>
+          requires: [ fetch-code ]
+      - test-debian:
+          context: << pipeline.parameters.ctx_auto_release >>
+          requires: [ fetch-code ]
+
+  workflow-selector:
+    when:
+      and:
+        - equal: ["workflow-selector", << pipeline.parameters.triggered_flow >>]
+        - equal: [ main, << pipeline.git.branch >> ]
+    jobs:
+      - vr/workflow-selector:
+          context: << pipeline.parameters.ctx_auto_release >>
+          ssh_finger: << pipeline.parameters.ssh_finger >>
+
+  publish-changelog:
+    when:
+      and:
+        - equal: ["publish-changelog", << pipeline.parameters.triggered_flow >>]
+    jobs:
+      - vr/publish-changelog:
+          context: << pipeline.parameters.ctx_auto_release >>
+          ssh_finger: << pipeline.parameters.ssh_finger >>
+
+  publish-release-tag:
+    when:
+      and:
+        - equal: ["publish-release-tag", << pipeline.parameters.triggered_flow >>]
+    jobs:
+      - vr/tag-and-release: # release the code as its own semver
+          context: << pipeline.parameters.ctx_auto_release >>
