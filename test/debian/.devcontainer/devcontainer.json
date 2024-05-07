@@ -1,0 +1,25 @@
+{
+	"name": "dl-vscode-server-test",
+	"dockerComposeFile": "../compose.yml",
+	"service": "debian",
+	"workspaceFolder": "/home/app/src/github.com/b01/dl-vscode-server/test/debian",
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+	},
+
+	// Set *default* container specific settings.json values on container create.
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+			]
+		}
+	},
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "echo \"done\"",
+	"shutdownAction": "stopCompose"
+}

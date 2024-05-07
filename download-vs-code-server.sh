@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2023 Khalifah K. Shabazz
+# Copyright 2024 Khalifah K. Shabazz
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the “Software”),
@@ -38,12 +38,15 @@ get_latest_release() {
 
 PLATFORM="${1}"
 ARCH="${2}"
+RETURN_VERSION="${3}"
 
+# Platform is required
 if [ -z "${PLATFORM}" ]; then
     echo "please enter a platform, acceptable values are win32, linux, darwin, or alpine"
     exit 1
 fi
 
+# if non specified, then guess
 if [ -z "${ARCH}" ]; then
     U_NAME=$(uname -m)
 
@@ -59,25 +62,53 @@ fi
 commit_sha=$(get_latest_release "${PLATFORM}" "${ARCH}")
 
 if [ -n "${commit_sha}" ]; then
-    echo "will attempt to download VS Code Server version = '${commit_sha}'"
+    echo "will attempt to download and pre-configure VS Code Server version '${commit_sha}'"
 
+    # this downloads vs-code with the server built in, not sure how to use that yet or if it possible to use
     prefix="server-${PLATFORM}"
+    # TODO: Find the correct download location for Alpine, this is just the code-server cli, other files are not present.
+    # There is a clue when when the remote extension installs the server, but it does not reveal where it downloads it
+    # from.
     if [ "${PLATFORM}" = "alpine" ]; then
+        echo "NOTICE! Alpine is experimental"
         prefix="cli-${PLATFORM}"
     fi
 
     archive="vscode-${prefix}-${ARCH}.tar.gz"
+    printf "%s" "downloading ${archive}..."
     # Download VS Code Server tarball to tmp directory.
-    curl -L "https://update.code.visualstudio.com/commit:${commit_sha}/${prefix}-${ARCH}/stable" -o "/tmp/${archive}"
+    curl -s --fail -L "https://update.code.visualstudio.com/commit:${commit_sha}/${prefix}-${ARCH}/stable" -o "/tmp/${archive}"
+#    curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-x64/stable" -o "/tmp/${archive}"
+    echo "done"
 
+    echo "setup directories:"
     # Make the parent directory where the server should live.
-    # NOTE: Ensure VS Code will have read/write access; namely the user running VScode or container user.
+    # NOTE: VS Code will runas the logged in user, so ensure they have read/write to the following directories
     mkdir -vp ~/.vscode-server/bin/"${commit_sha}"
+    # VSCode Requirements for pre-installing extensions
+    mkdir -vp ~/.vscode-server/extensions
+    # found this in the VSCode remote extension output when connecting to an existing container
+    mkdir -vp ~/.vscode-server/extensionsCache
+
+    echo "done"
 
     # Extract the tarball to the right location.
-    tar --no-same-owner -xzv --strip-components=1 -C ~/.vscode-server/bin/"${commit_sha}" -f "/tmp/${archive}"
-    # Add symlink
+    printf "%s" "extracting ${archive}..."
+    tar -xz -C ~/.vscode-server/bin/"${commit_sha}" --strip-components=1 --no-same-owner -f "/tmp/${archive}"
+    echo "done"
+
+    # Add symlinks
+    printf "%s" "setup symlinks..."
     cd ~/.vscode-server/bin && ln -s "${commit_sha}" default_version
+    echo "done"
+
+    # Used for testing script
+    if [ "${RETURN_VERSION}" = "yes" ]; then
+      ln -s "${HOME}"/.vscode-server/bin/"${commit_sha}"/bin/code-server "${HOME}"/code-server
+      echo "${commit_sha}" > "${HOME}"/vs-code-version.txt
+    fi
+
+    echo "VS Code server pre-install completed"
 else
     echo "could not pre install vscode server"
 fi

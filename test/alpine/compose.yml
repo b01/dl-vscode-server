@@ -1,0 +1,17 @@
+services:
+    alpine:
+        build:
+            args:
+                USER_NAME: '${USER_NAME}'
+                REPO: '${REPO}'
+            dockerfile: 'test/alpine/Dockerfile'
+            context: '../..'
+        image: 'dl-vscode-server-alpine'
+        # ports:
+        #     - '32885:32885'
+        volumes:
+          - './:/home/${USER_NAME}/src/${REPO}/test/alpine'
+          - 'vscode_ext:/home/${USER_NAME}/.vscode-server/extensions'
+
+volumes:
+   vscode_ext: null
