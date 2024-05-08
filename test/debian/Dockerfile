@@ -15,6 +15,8 @@ ARG USER_GROUP
 ARG REPO
 ARG WD
 
+WORKDIR /tmp
+
 # VS Code Server requirements: openssh, musl, libgcc, libstdc++
 # For details see: https://code.visualstudio.com/docs/remote/linux
 RUN apt-get -qq update -qq && apt-get -qq install -qq \
