@@ -62,30 +62,21 @@ fi
 commit_sha=$(get_latest_release "${PLATFORM}" "${ARCH}")
 
 if [ -n "${commit_sha}" ]; then
-    echo "will attempt to download and pre-configure VS Code Server version '${commit_sha}'"
+    echo "attempting to download and pre-install VS Code Server version '${commit_sha}'"
 
-    # Downloads VS Code with the server built in, not sure how to use that yet or if it possible since VS code client
-    # or the remote extension seems to verify specifics files, like "node"
-    prefix="server-${PLATFORM}"
-    # TODO: Find the correct download location for Alpine, this is just the code cli, which does have the sever built in,
-    # but the tar does not contain any other files that are required for a proper install.
-    # There is a clue when the remote extension installs the server, but it does not reveal the URL where it downloads
-    # it from. Instead it seems to copy it to the container then used the `dd` command to transfer it to the container,
-    # strange indeed.
-    # I don't understand why Alpine is still considered experimental other that the fact that some extensions require
-    # glibc, but the same would be the case for extensions that require python or something else.
-    # Keeping this for now as it was requested. But we need the correct URL. But it does not seem to work as far as
-    # I've tested.
-    if [ "${PLATFORM}" = "alpine" ]; then
-        echo "NOTICE! Alpine is experimental"
-        prefix="cli-${PLATFORM}"
-    fi
+    archive="vscode-server-${PLATFORM}-${ARCH}.tar.gz"
 
-    archive="vscode-${prefix}-${ARCH}.tar.gz"
     printf "%s" "downloading ${archive}..."
     # Download VS Code Server tarball to tmp directory.
-    curl -s --fail -L "https://update.code.visualstudio.com/commit:${commit_sha}/${prefix}-${ARCH}/stable" -o "/tmp/${archive}"
-#    curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-x64/stable" -o "/tmp/${archive}"
+    curl -s --fail -L "https://update.code.visualstudio.com/commit:${commit_sha}/server-${PLATFORM}-${ARCH}/stable" -o "/tmp/${archive}"
+    # Examples:
+    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-x64/stable" -o "/tmp/${archive}"
+    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-darwin-arm64/stable" -o "/tmp/${archive}"D
+    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-alpine/stable" -o "/tmp/${archive}"D
+    # TODO: Provide a script for downloading on Windows
+    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-win32-x64/stable" -o "/tmp/${archive}"D
+    # With this URL you can get Insider editions 't need the latest commit hash, as it always gets latest
+    # https://update.code.visualstudio.com/commit:${commit_sha}/server-${PLATFORM}-${ARCH}/insider
     echo "done"
 
     echo "setup directories:"
