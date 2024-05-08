@@ -34,6 +34,14 @@ Example:
 curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code-server.sh | bash -s -- "linux"
 ```
 
+### Arguments
+
+**PLATFORM** - Currently only `linux` or `alpine` are supported.
+
+**ARCH** - Optional, will default to `uname -m`, which will map to a value
+that Microsoft expects, so for, aarch64 => arm64, x86_64 => x64, and
+armv7l => armhf. If you supply a value, that will be used without being mapped.
+
 ---
 
 [b01/download-vs-code-server.sh]: https://gist.github.com/b01/0a16b6645ab7921b0910603dfb85e4fb
