@@ -31,15 +31,15 @@ RUN apk --no-progress --purge --no-cache upgrade \
  && rm -vrf /var/cache/apk/*
 
 ## Add a non-root group and user to runas
-#RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
-# && adduser --system \
-#    --disabled-password \
-#    --ingroup ${USER_GROUP} \
-#    --uid ${USER_UID} \
-#    ${USER_NAME}
-#
-#USER ${USER_NAME}
-#
+RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
+ && adduser --system \
+    --disabled-password \
+    --ingroup ${USER_GROUP} \
+    --uid ${USER_UID} \
+    ${USER_NAME}
+
+USER ${USER_NAME}
+
 COPY --chmod=${USER_NAME}:${USER_NAME} test/alpine/start.sh /usr/local/bin
 
 HEALTHCHECK --interval=5m --timeout=3s \
@@ -52,7 +52,6 @@ COPY --chmod=${USER_NAME}:${USER_NAME} setup-server-via-vs-code-cli.sh /tmp
 
 # Install VS Code Server
 RUN /tmp/download-vs-code-server.sh "linux" "alpine" "yes"
-RUN #/tmp/setup-server-via-vs-code-cli.sh "linux" "alpine" "yes"
+RUN /tmp/setup-server-via-vs-code-cli.sh "alpine" "x64" "yes"
 
-#WORKDIR ${WD}
-#SHELL [ "/bin/bash", "-c" ]
+WORKDIR ${WD}

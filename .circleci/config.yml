@@ -70,7 +70,7 @@ jobs:
         - attach_workspace: { at: "." }
         - *remote_worker
         - run:
-            name: "Test with Alpine (GLibC edition)"
+            name: "Test VS Code Server with Alpine (GLibC edition)"
             command: |
               cd test/alpine
               DH_IMG=test-alpine-glibc
@@ -84,10 +84,24 @@ jobs:
         - attach_workspace: { at: "." }
         - *remote_worker
         - run:
-            name: "Build Alpine glibc against NodeJS"
+            name: "Test VS Code Server with Debian"
             command: |
               cd test/debian
               DH_IMG=test-debian
+              docker build --rm -t "${DH_IMG}" -f ./Dockerfile ../..
+              docker run --rm --entrypoint /home/app/code-server "${DH_IMG}" --version
+              docker rmi "${DH_IMG}"
+
+    test-alpine-musl:
+      executor: base
+      steps:
+        - attach_workspace: { at: "." }
+        - *remote_worker
+        - run:
+            name: "Test VS Code Server with Alpine musl"
+            command: |
+              cd test/alpine-musl
+              DH_IMG=test-alpine-musl
               docker build --rm -t "${DH_IMG}" -f ./Dockerfile ../..
               docker run --rm --entrypoint /home/app/code-server "${DH_IMG}" --version
               docker rmi "${DH_IMG}"
@@ -104,6 +118,9 @@ workflows:
           context: << pipeline.parameters.ctx_auto_release >>
           requires: [ fetch-code ]
       - test-debian:
+          context: << pipeline.parameters.ctx_auto_release >>
+          requires: [ fetch-code ]
+      - test-alpine-musl:
           context: << pipeline.parameters.ctx_auto_release >>
           requires: [ fetch-code ]
 
