@@ -1,10 +1,22 @@
 # DL VS Code Server
 
-This script downloads a tar of VS Code Server, then extracts it to a location expected by VS Code clients. The intention of this script is to download and setup the server during image build. This helps to ensure in certain scenarios that the server is there when internet is not, while still allowing your VS code client to connect to it.
+This script downloads a tar of VS Code Server, then extracts it to a location
+expected by VS Code clients. The intention of this script is to download and
+setup of the server during image build. This helps to ensure in certain
+scenarios that the server is there when internet is not, while still allowing
+your VS code client to connect to it.
 
-Another reason is to prevent the constand download and install of VS Code server when the container is removed then run again later. With the sever being embeded in the image, it should not need to download until an update to VS Code itself, which would expect a new version of the server.
+To get the latest version of VS COde server, just rebuild the image.
 
-This originally started as a Gist. you can veiew previous version of this script at [b01/download-vs-code-server.sh]
+## Background
+
+The original reason was and still is to prevent the constant download and
+install of VS Code server when the container is removed then run again later.
+With the server being embedded in the image, it should also reduce time for the
+dev container to be ready.
+
+It originally started as a Gist; which you can review previous versions of the
+script at [b01/download-vs-code-server.sh]
 
 ## Status
 
