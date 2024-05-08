@@ -5,7 +5,9 @@ ARG USER_GROUP='app_users'
 ARG REPO='githunb.com/b01/dl-vscode-server'
 ARG WD="/home/${USER_NAME}/src/${REPO}/test/alpine"
 
-# VS Code, unfortunately, relies on GNU Lib C. So see if we can use Kohirens Alpine GNU LibC image.
+# VS Code, unfortunately, relies on GNU Lib C as may some extensions. Good news,
+# we can use Kohirens Alpine GNU LibC image as base, it has GNY Lib C built for
+# Alpine (in an Alpine container) and it works!
 FROM kohirens/alpine-glibc:3.19-2.39
 
 ARG USER_NAME
@@ -15,6 +17,10 @@ ARG USER_GROUP
 ARG REPO
 ARG WD
 
+WORKDIR /tmp
+
+# VS Code Server requirements, for details see:
+# https://code.visualstudio.com/docs/remote/linux
 RUN apk --no-progress --purge --no-cache upgrade \
  && apk --no-progress --purge --no-cache add --upgrade \
     bash \
