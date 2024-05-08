@@ -40,18 +40,16 @@ RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
 
 USER ${USER_NAME}
 
-COPY --chmod=${USER_NAME}:${USER_NAME} test/alpine/start.sh /usr/local/bin
+COPY --chown=${USER_NAME}:${USER_NAME} test/alpine/start.sh /usr/local/bin
 
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD echo "healthy" || exit 1
 
 ENTRYPOINT [ "start.sh" ]
 
-COPY --chmod=${USER_NAME}:${USER_NAME} download-vs-code-server.sh /tmp
-COPY --chmod=${USER_NAME}:${USER_NAME} setup-server-via-vs-code-cli.sh /tmp
+COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code-server.sh /tmp
 
 # Install VS Code Server
 RUN /tmp/download-vs-code-server.sh "linux" "alpine" "yes"
-RUN /tmp/setup-server-via-vs-code-cli.sh "alpine" "x64" "yes"
 
 WORKDIR ${WD}
