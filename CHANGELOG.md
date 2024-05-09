@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2024-05-09
+
+### 🐛 Bug Fixes
+
+- VS Code Server Download URL
+
+### 🧪 Testing
+
+- With Alpine Musl
+
+### ⚙️ Miscellaneous Tasks
+
+- Clean Up Test Images
+
+### Add
+
+- VS Code Symlink
+
 ## [0.1.1] - 2024-05-08
 
 ### 📚 Documentation
