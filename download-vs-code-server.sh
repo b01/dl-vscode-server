@@ -88,7 +88,7 @@ if [ -n "${commit_sha}" ]; then
     # found this in the VSCode remote extension output when connecting to an existing container
     mkdir -vp ~/.vscode-server/extensionsCache
     # This should handle installs for https://vscode.dev/
-    mkdir -vp ~/.vscode/cli/servers/Stable-"${commit_sha}"
+    mkdir -vp ~/.vscode-server/cli/servers/Stable-"${commit_sha}"
     echo "done"
 
     # Extract the tarball to the right location.
@@ -99,7 +99,7 @@ if [ -n "${commit_sha}" ]; then
     # Add symlinks
     echo "%s" "setup symlinks"
     ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode-server/bin/default_version
-    ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode/cli/servers/Stable-"${commit_sha}"/server
+    ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode-server/cli/servers/Stable-"${commit_sha}"/server
     echo "done"
 
     # Used for testing script
