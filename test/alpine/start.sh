@@ -23,9 +23,8 @@ echo "Started"
 
 last_signal=""
 
-# Fork a loop as a child process, which keeps this script running. When we
-# receive term signal the loop wil be killed. It has very low CPU usage.
-# When this process receives a signal to be stopped, shutd function will run.
+# Keep the script running until this process receives the TERM signal to be
+# stopped, which will trigger shutd and set the value to end the loop.
 while [ "${last_signal}" != "15" ]; do
     sleep 1
 done
