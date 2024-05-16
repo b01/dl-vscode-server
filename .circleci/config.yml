@@ -21,7 +21,7 @@ remote_worker: &remote_worker
     docker_layer_caching: true
 
 orbs:
-  vr: kohirens/version-release@4.0.2
+  vr: kohirens/version-release@4.0.3
 
 parameters:
   alpine_version_file:
