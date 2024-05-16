@@ -1,12 +1,13 @@
 # DL VS Code Server
 
 This script downloads a tar of VS Code Server, then extracts it to a location
-expected by VS Code clients. The intention of this script is to download and
-setup of the server during image build. This helps to ensure in certain
-scenarios that the server is there when internet is not, while still allowing
-your VS code client to connect to it.
+expected by VS Code clients. The intention of this script is to pre-install
+the server during image build. This helps ensure, in certain scenarios,
+that the server is there when internet is not; while still allowing your VS
+Code client to connect to it.
 
-To get the latest version of VS COde server, just rebuild the image.
+To get the latest version of VS COde server pre-installed, then re-run the
+script.
 
 ## Background
 
@@ -36,11 +37,12 @@ curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-
 
 ### Arguments
 
-**PLATFORM** - Currently only `linux` or `alpine` are supported.
+**PLATFORM** - Currently `linux`, `alpine`, and any others Microsoft supports.
 
 **ARCH** - Optional, will default to `uname -m`, which will map to a value
-that Microsoft expects, so for, aarch64 => arm64, x86_64 => x64, and
-armv7l => armhf. If you supply a value, that will be used without being mapped.
+that Microsoft expects, so for, aarch64 => arm64, x86_64 => x64, and so on.
+`armv7l` will map to armhf. It best to specify the arch if you know it.
+If you supply a value, that will be used without being mapped.
 
 ---
 
