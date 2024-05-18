@@ -76,6 +76,7 @@ jobs:
               DH_IMG=test-alpine-glibc
               docker build --rm -t "${DH_IMG}" -f ./Dockerfile ../..
               docker run --rm --entrypoint /home/app/code-server "${DH_IMG}" --version
+              docker run --rm --entrypoint /home/app/code "${DH_IMG}" --version
               docker rmi "${DH_IMG}"
 
     test-debian:
@@ -90,6 +91,7 @@ jobs:
               DH_IMG=test-debian
               docker build --rm -t "${DH_IMG}" -f ./Dockerfile ../..
               docker run --rm --entrypoint /home/app/code-server "${DH_IMG}" --version
+              docker run --rm --entrypoint /home/app/code "${DH_IMG}" --version
               docker rmi "${DH_IMG}"
 
     test-alpine-musl:

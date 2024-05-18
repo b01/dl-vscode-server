@@ -33,6 +33,13 @@ RUN apk --no-progress --purge --no-cache upgrade \
 && apk --no-progress --purge --no-cache upgrade \
  && rm -vrf /var/cache/apk/*
 
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD echo "healthy" || exit 1
+
+COPY --chmod=+x test/alpine/start.sh /usr/local/bin
+
+ENTRYPOINT [ "start.sh" ]
+
 # Add a non-root group and user to runas
 RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
  && adduser --system \
@@ -41,19 +48,14 @@ RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
     --uid ${USER_UID} \
     ${USER_NAME}
 
+#RUN cat /etc/passwd \
+# && sed -i '|(root:x:0:0:root:/root:)/bin/ash$|$1|g' /etc/passwd
 USER ${USER_NAME}
 
-COPY --chown=${USER_NAME}:${USER_NAME} test/alpine/start.sh /usr/local/bin
-
-HEALTHCHECK --interval=5m --timeout=3s \
-  CMD echo "healthy" || exit 1
-
-ENTRYPOINT [ "start.sh" ]
-
-COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code-server.sh /tmp
+COPY --chown=${USER_NAME}:${USER_NAME} --chmod=+x download-vs-code.sh /tmp
 
 # Install VS Code Server
-RUN chmod +x /tmp/download-vs-code-server.sh \
- && /tmp/download-vs-code-server.sh "linux" "x64" "yes"
+RUN /tmp/download-vs-code.sh "linux" "x64" --dump-version
+RUN /tmp/download-vs-code.sh "linux" "x64" --dump-version --cli
 
 WORKDIR ${WD}
