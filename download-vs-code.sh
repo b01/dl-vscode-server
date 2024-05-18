@@ -100,7 +100,7 @@ PLATFORM=""
 ARCH=""
 BUILD="stable"
 BIN_TYPE="server"
-RETURN_VERSION=""
+DUMP_COMMIT_SHA=""
 IS_ALPINE=0
 
 while [ ${#} -gt 0 ]; do
@@ -110,8 +110,8 @@ while [ ${#} -gt 0 ]; do
         --insider)
             BUILD="insider"
             ;;
-        --dump-version)
-            RETURN_VERSION="yes"
+        --dump-sha)
+            DUMP_COMMIT_SHA="yes"
             ;;
         --cli)
             BIN_TYPE="cli"
@@ -176,9 +176,9 @@ if [ -z "${commit_sha}" ]; then
     exit 1
 fi
 
-# Used for testing script
-if [ "${RETURN_VERSION}" = "yes" ]; then
-    echo "${commit_sha}" > "${HOME}"/vs-code-"${BIN_TYPE}"-version.txt
+if [ "${DUMP_COMMIT_SHA}" = "yes" ]; then
+    echo "${commit_sha}"
+    exit 0
 fi
 
 echo "attempting to download and pre-install VS Code ${BIN_TYPE} version '${commit_sha}'"

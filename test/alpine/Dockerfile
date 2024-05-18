@@ -55,7 +55,7 @@ USER ${USER_NAME}
 COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code.sh /tmp
 
 # Install VS Code Server
-RUN /tmp/download-vs-code.sh "linux" "x64" --dump-version
-RUN /tmp/download-vs-code.sh "linux" "x64" --dump-version --cli
+RUN /tmp/download-vs-code.sh "linux" "x64"
+RUN /tmp/download-vs-code.sh "linux" "x64" --cli
 
 WORKDIR ${WD}
