@@ -47,7 +47,7 @@ RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
 
 USER ${USER_NAME}
 
-COPY --chown=${USER_NAME}:${USER_NAME} --chmod=+x download-vs-code.sh /tmp
+COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code.sh /tmp
 
 # Install VS Code Server
 # NOTE: To download VS Code server use the --alpine flag to force PLATFORM="linux" and ARCH="alpine", the actual input will be ignored.
