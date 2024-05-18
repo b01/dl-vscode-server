@@ -29,7 +29,7 @@ RUN apt-get -qq update -qq && apt-get -qq install -qq \
 && apt-get -qq update \
  && rm -rf /var/lib/apt/lists/*
 
-COPY --chmod=+x test/alpine/start.sh /usr/local/bin
+COPY --chmod=+x test/debian/start.sh /usr/local/bin
 
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD echo "healthy" || exit 1
