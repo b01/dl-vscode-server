@@ -68,20 +68,23 @@ if [ -n "${commit_sha}" ]; then
 
     printf "%s" "downloading ${archive}..."
     # Download VS Code Server tarball to tmp directory.
-    curl -s --fail -L "https://update.code.visualstudio.com/commit:${commit_sha}/server-${PLATFORM}-${ARCH}/stable" -o "/tmp/${archive}"
-    # Examples:
-    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-x64/stable" -o "/tmp/${archive}"
-    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-darwin-arm64/stable" -o "/tmp/${archive}"D
-    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-alpine/stable" -o "/tmp/${archive}"D
-    # TODO: Provide a script for downloading on Windows
-    # curl -s --fail -L "https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-win32-x64/stable" -o "/tmp/${archive}"D
-    # With this URL you can get Insider editions 't need the latest commit hash, as it always gets latest
+    curl -s --fail -L "https://update.code.visualstudio.com/commit:${commit_sha}/server-${PLATFORM}-${ARCH}/${BUILD}" -o "/tmp/${archive}"
+    # Working URLs that helped derived format:
+    # https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-x64/stable
+    # https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-darwin-x64/stable
+    # https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-darwin-arm64/stable
+    # https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-alpine/stable
+    # https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-win32-x64/stable
+
+    # NOTE: With this URL you can get Insider editions 't need the latest commit hash, as it always gets latest
     # https://update.code.visualstudio.com/commit:${commit_sha}/server-${PLATFORM}-${ARCH}/insider
     echo "done"
 
     echo "setup directories:"
-    # Make the parent directory where the server should live.
-    # NOTE: VS Code will runas the logged in user, so ensure they have read/write to the following directories
+    # Make the directories where the VS Code will search. There may be others not
+    # listed here.
+    # NOTE: VS Code will runas the logged in user, so ensure they have
+    #       read/write to the following directories
     mkdir -vp ~/.vscode-server/bin/"${commit_sha}"
     # VSCode Requirements for pre-installing extensions
     mkdir -vp ~/.vscode-server/extensions
