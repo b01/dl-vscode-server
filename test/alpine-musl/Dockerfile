@@ -51,7 +51,7 @@ COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code.sh /tmp
 
 # Install VS Code Server
 # NOTE: To download VS Code server use the --alpine flag to force PLATFORM="linux" and ARCH="alpine", the actual input will be ignored.
-RUN /tmp/download-vs-code.sh "alpine" "x64" --dump-version --alpine
-RUN /tmp/download-vs-code.sh "alpine" "x64" --dump-version --cli
+RUN /tmp/download-vs-code.sh "alpine" "x64" --alpine
+RUN /tmp/download-vs-code.sh "alpine" "x64" --cli
 
 WORKDIR ${WD}
