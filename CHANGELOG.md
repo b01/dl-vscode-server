@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2024-05-18
+
+### 🚀 Features
+
+- Script download-vs-code.sh
+
+### 🐛 Bug Fixes
+
+- Adding Symbolic Link
+
+### 📚 Documentation
+
+- Client Documentation
+
+### 🧪 Testing
+
+- Change Default Shell
+
+### ⚙️ Miscellaneous Tasks
+
+- Updated Documentation
+- Clean Up Docs
+- Upgrade CI Tools
+- Start Testing Documentation
+- Cleaned Up Comments
+- *(test)* Moved Dev Container Configurations
+- Added A License File
+- Fix Output Messaging
+
+### Add
+
+- Addtional Symbolic Link For Server
+
+### Chg
+
+- Dump Version
+
 ## [0.1.2] - 2024-05-09
 
 ### 🐛 Bug Fixes
