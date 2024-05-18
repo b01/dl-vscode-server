@@ -100,7 +100,7 @@ if [ -n "${commit_sha}" ]; then
     echo "done"
 
     # Add symlinks
-    echo "%s" "setup symlinks"
+    printf "%s" "setup symlinks..."
     ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode-server/bin/default_version
     ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode/cli/servers/Stable-"${commit_sha}"/server
     echo "done"

@@ -88,7 +88,7 @@ install_server() {
     echo "done"
 
     # Add symlinks
-    echo "%s" "setup symlinks"
+    printf "%s" "setup symlinks..."
     ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode-server/bin/default_version
     ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode/cli/servers/Stable-"${commit_sha}"/server
     ln -s ~/.vscode-server/bin/"${commit_sha}" ~/.vscode-server/cli/servers/Stable-${commit_sha}/server
@@ -200,7 +200,7 @@ archive="vscode-${options}.tar.gz"
 # https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-win32-x64/stable
 # Download VS Code tarball to the current directory.
 url="https://update.code.visualstudio.com/commit:${commit_sha}/${options}/${BUILD}"
-printf "%s" "downloading ${url}...${archive}"
+printf "%s" "downloading ${url} to ${archive} "
 curl -s --fail -L "${url}" -o "/tmp/${archive}"
 echo "done"
 
