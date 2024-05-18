@@ -1,12 +1,14 @@
 # DL VS Code Server
 
-This script downloads a tar of VS Code Server, then extracts it to a location
-expected by VS Code clients. The intention of this script is to pre-install
-the server during image build. This helps ensure, in certain scenarios,
-that the server is there when internet is not; while still allowing your VS
-Code client to connect to it.
+This script downloads a tar of VS Code Server/CLI, then extracts it to a
+location expected by tunnels made by VS Code clients.
 
-To get the latest version of VS COde server pre-installed, then re-run the
+The intention of this script is to pre-install the VS Code binary during
+container image build. This helps ensure, in certain scenarios, that the binary
+is there when internet is not; while still allowing your VS Code client to
+tunnel to the container.
+
+When the VS Code binary is out-of-date, to get the latest version, re-run the
 script.
 
 ## Background
@@ -23,26 +25,52 @@ script at [b01/download-vs-code-server.sh]
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/b01/dl-vscode-server/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/b01/dl-vscode-server/tree/main)
 
-## How To Use
+## How To Install
 
-You only need to download the script `download-vs-code-server.sh` and run it.
-
-`download-vs-code-server.sh <PLATFORM> <ARCH>`
-
-Example:
-
+### Shell
 ```shell
 curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code-server.sh | bash -s -- "linux"
 ```
 
-### Arguments
+### Docker
 
-**PLATFORM** - Currently `linux`, `alpine`, and any others Microsoft supports.
+```dockerfile
+ADD --chmod=777 \
+    https://raw.githubusercontent.com/b01/dl-vscode-server/updates-2024-05-16-01/download-vs-code.sh \
+    .
 
-**ARCH** - Optional, will default to `uname -m`, which will map to a value
-that Microsoft expects, so for, aarch64 => arm64, x86_64 => x64, and so on.
-`armv7l` will map to armhf. It best to specify the arch if you know it.
-If you supply a value, that will be used without being mapped.
+# Install VS Code Server and Requirements
+RUN ./download-vs-code.sh "linux" "x64" --alpine
+```
+
+## How To Use
+
+`download-vs-code.sh [options] <PLATFORM> [<ARCH>]`
+
+### Example:
+
+download-vs-code.sh \"linux\" \"x64\" --alpine
+
+### Options
+
+`--insider`
+Switches to the pre-released version of the binary chosen (server or
+CLI).
+
+`--dump-sha`
+Will print the latest commit sha for VS Code (server and CLI are current
+synced and always the same)
+
+`--cli`
+Switches the binary download VS Code CLI.
+
+`--alpine`
+Only works when downloading VS Code Server, it will force PLATFORM=linux and
+ARCH=alpine, as the developers deviated from the standard format used for all
+others.
+
+`-h, --help`
+Print this usage info
 
 ---
 

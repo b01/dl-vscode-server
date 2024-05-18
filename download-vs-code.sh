@@ -21,7 +21,36 @@
 # IN THE SOFTWARE.
 
 set -e
+usage="
+This script downloads a tar of VS Code Server/CLI, then extracts it to a
+location expected by tunnels made by VS Code clients.
 
+download-vs-code.sh [options] <PLATFORM> [<ARCH>]
+
+Example:
+  download-vs-code.sh \"linux\" \"x64\" --alpine
+
+Options
+
+--insider
+    Switches to the pre-released version of the binary chosen (server or
+    CLI).
+
+--dump-sha
+    Will print the latest commit sha for VS Code (server and CLI are current
+    synced and always the same).
+
+--cli
+    Switches the binary download VS Code CLI.
+
+--alpine
+    Only works when downloading VS Code Server, it will force PLATFORM=linux and
+    ARCH=alpine, as the developers deviated from the standard format used for
+    all others.
+
+-h, --help
+    Print this usage info.
+"
 # Get the latest VS Code commit sha.
 get_latest_release() {
     platform=${1}
@@ -120,6 +149,10 @@ while [ ${#} -gt 0 ]; do
         --alpine)
             IS_ALPINE=1
             ;;
+        -h|--help)
+            echo "${usage}"
+            exit 0
+            ;;
         -*|--*)
             echo "Unknown option ${op}"
             exit 1
@@ -170,6 +203,7 @@ if [ "${BIN_TYPE}" = "server" -a ${IS_ALPINE} -eq 1 ]; then
     ARCH="alpine" # Alpine is NOT an Arch but a flavor of Linux, oh well.
 fi
 
+# We hard-code this because all but a few options returns a 404.
 commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
 
 if [ -z "${commit_sha}" ]; then
@@ -187,18 +221,6 @@ echo "attempting to download and pre-install VS Code ${BIN_TYPE} version '${comm
 options="${BIN_TYPE}-${PLATFORM}-${ARCH}"
 archive="vscode-${options}.tar.gz"
 
-# URLs that helped derived format:
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/cli-linux-x64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/cli-alpine-x64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/cli-darwin-x64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/cli-darwin-arm64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/cli-win32-x64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/cli-win32-arm64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-x64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-darwin-x64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-darwin-arm64/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-linux-alpine/stable
-# https://update.code.visualstudio.com/commit:b58957e67ee1e712cebf466b995adf4c5307b2bd/server-win32-x64/stable
 # Download VS Code tarball to the current directory.
 url="https://update.code.visualstudio.com/commit:${commit_sha}/${options}/${BUILD}"
 printf "%s" "downloading ${url} to ${archive} "

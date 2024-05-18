@@ -30,7 +30,7 @@ RUN apk --no-progress --purge --no-cache upgrade \
 && apk --no-progress --purge --no-cache upgrade \
  && rm -vrf /var/cache/apk/*
 
-COPY  --chmod=+x test/alpine/start.sh /usr/local/bin
+COPY  --chmod=+x test/alpine-musl/start.sh /usr/local/bin
 
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD echo "healthy" || exit 1
