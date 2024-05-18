@@ -43,6 +43,7 @@ RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
     --disabled-password \
     --ingroup ${USER_GROUP} \
     --uid ${USER_UID} \
+    --shell /bin/bash \
     ${USER_NAME}
 
 USER ${USER_NAME}

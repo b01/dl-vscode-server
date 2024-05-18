@@ -46,10 +46,9 @@ RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
     --disabled-password \
     --ingroup ${USER_GROUP} \
     --uid ${USER_UID} \
+    --shell /bin/bash \
     ${USER_NAME}
 
-#RUN cat /etc/passwd \
-# && sed -i '|(root:x:0:0:root:/root:)/bin/ash$|$1|g' /etc/passwd
 USER ${USER_NAME}
 
 COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code.sh /tmp
