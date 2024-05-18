@@ -29,6 +29,13 @@ RUN apt-get -qq update -qq && apt-get -qq install -qq \
 && apt-get -qq update \
  && rm -rf /var/lib/apt/lists/*
 
+COPY --chmod=+x test/alpine/start.sh /usr/local/bin
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD echo "healthy" || exit 1
+
+ENTRYPOINT [ "start.sh" ]
+
 # Add a non-root group and user to runas
 RUN addgroup --gid ${USER_GID} ${USER_GROUP} \
  && adduser --disabled-password \
@@ -38,17 +45,11 @@ RUN addgroup --gid ${USER_GID} ${USER_GROUP} \
 
 USER ${USER_NAME}
 
-COPY --chown=${USER_NAME}:${USER_NAME} --chmod=644 test/alpine/start.sh /usr/local/bin
-
-HEALTHCHECK --interval=5m --timeout=3s \
-  CMD echo "healthy" || exit 1
-
-ENTRYPOINT [ "start.sh" ]
-
-COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code-server.sh /tmp
+COPY --chown=${USER_NAME}:${USER_NAME} --chmod=+x download-vs-code.sh /tmp
 
 # Install VS Code Server
-RUN chmod +x /tmp/download-vs-code-server.sh \
- && /tmp/download-vs-code-server.sh "linux" "x64" "yes"
+RUN /tmp/download-vs-code.sh "linux" "x64" --dump-version
+# Install VS Code CLI
+RUN /tmp/download-vs-code.sh "linux" "x64" --dump-version --cli
 
 WORKDIR ${WD}

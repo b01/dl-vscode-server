@@ -30,6 +30,13 @@ RUN apk --no-progress --purge --no-cache upgrade \
 && apk --no-progress --purge --no-cache upgrade \
  && rm -vrf /var/cache/apk/*
 
+COPY  --chmod=+x test/alpine/start.sh /usr/local/bin
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD echo "healthy" || exit 1
+
+ENTRYPOINT [ "start.sh" ]
+
 ## Add a non-root group and user to runas
 RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
  && adduser --system \
@@ -40,16 +47,11 @@ RUN addgroup --system --gid ${USER_GID} ${USER_GROUP} \
 
 USER ${USER_NAME}
 
-COPY --chown=${USER_NAME}:${USER_NAME} test/alpine/start.sh /usr/local/bin
-
-HEALTHCHECK --interval=5m --timeout=3s \
-  CMD echo "healthy" || exit 1
-
-ENTRYPOINT [ "start.sh" ]
-
-COPY --chown=${USER_NAME}:${USER_NAME} --chmod=777 download-vs-code-server.sh /tmp
+COPY --chown=${USER_NAME}:${USER_NAME} --chmod=+x download-vs-code.sh /tmp
 
 # Install VS Code Server
-RUN /tmp/download-vs-code-server.sh "linux" "alpine" "yes"
+# NOTE: To download VS Code server use the --alpine flag to force PLATFORM="linux" and ARCH="alpine", the actual input will be ignored.
+RUN /tmp/download-vs-code.sh "alpine" "x64" --dump-version --alpine
+RUN /tmp/download-vs-code.sh "alpine" "x64" --dump-version --cli
 
 WORKDIR ${WD}
