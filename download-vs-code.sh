@@ -47,6 +47,9 @@ Options
     Only works when downloading VS Code Server, it will force PLATFORM=linux and
     ARCH=alpine, as the developers deviated from the standard format used for
     all others.
+--extensions
+    specify which extensions to install. expects a string of full extension names seperated by commas,
+    e.g ms-vscode.PowerShell,redhat.ansible,ms-python.vscode-pylance
 
 -h, --help
     Print this usage info.
@@ -153,6 +156,15 @@ while [ ${#} -gt 0 ]; do
             echo "${usage}"
             exit 0
             ;;
+        --extensions)
+            if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
+                EXTENSIONS="$1"
+                shift
+            else
+                echo "Error: --extensions requires a parameter"
+                exit 1
+            fi
+            ;;
         -*|--*)
             echo "Unknown option ${op}"
             exit 1
@@ -235,3 +247,9 @@ else
 fi
 
 echo "VS Code server pre-install completed"
+echo "downloading extensions..."
+
+echo "$EXTENSIONS" | tr ',' '\n' | while IFS= read -r ext; do
+    ~/code-server --install-extension "$ext"
+done
+echo "extensions installation complete"
