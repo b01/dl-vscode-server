@@ -40,7 +40,7 @@ ADD --chmod=777 \
     .
 
 # Install VS Code Server and Requirements
-RUN ./download-vs-code.sh "linux" "x64" --alpine
+RUN ./download-vs-code.sh "linux" "x64" --alpine --extensions dbaeumer.vscode-eslint
 ```
 
 ## How To Use
@@ -71,6 +71,11 @@ others.
 
 `-h, --help`
 Print this usage info
+
+`--extensions`
+    specify which extensions to install. expects a string of full extension names seperated by commas,
+    e.g ms-vscode.PowerShell,redhat.ansible,ms-python.vscode-pylance
+
 
 ---
 
