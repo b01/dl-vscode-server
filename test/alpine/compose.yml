@@ -9,8 +9,9 @@ services:
         image: 'dl-vscode-server-alpine'
         # ports:
         #     - '32885:32885'
+        working_dir: '/home/${USER_NAME}/src/${REPO}/test/alpine'
         volumes:
-          - './:/home/${USER_NAME}/src/${REPO}/test/alpine'
+          - '../../:/home/${USER_NAME}/src/${REPO}/'
           - 'vscode_ext:/home/${USER_NAME}/.vscode-server/extensions'
 
 volumes:
