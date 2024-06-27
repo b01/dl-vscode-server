@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2024-06-27
+
+### Add
+
+- Option To Install A List Of Extensions
+
+### Chg
+
+- Script To Use GetOpt For Input Handling
+
 ## [0.2.0] - 2024-05-18
 
 ### 🚀 Features
