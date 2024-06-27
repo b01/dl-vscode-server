@@ -21,6 +21,7 @@
 # IN THE SOFTWARE.
 
 set -e
+
 usage="
 This script downloads a tar of VS Code Server/CLI, then extracts it to a
 location expected by tunnels made by VS Code clients.
@@ -54,6 +55,7 @@ Options
 -h, --help
     Print this usage info.
 "
+
 # Get the latest VS Code commit sha.
 get_latest_release() {
     platform=${1}
@@ -129,6 +131,19 @@ install_server() {
     echo "done"
 }
 
+## Parse command line options, proper
+getopt --test > /dev/null && true
+if [ $? -ne 4 ]; then
+    echo 'sorry, getopts --test` failed in this environment'
+    exit 1
+fi
+
+LONG_OPTS=help,insider,dump-sha,cli,alpine,extensions:
+OPTIONS=h
+
+PARSED=$(getopt --options=${OPTIONS} --longoptions=${LONG_OPTS} --name "$0" -- "${@}") || exit 1
+eval set -- "${PARSED}"
+
 PLATFORM=""
 ARCH=""
 BUILD="stable"
@@ -136,64 +151,61 @@ BIN_TYPE="server"
 DUMP_COMMIT_SHA=""
 IS_ALPINE=0
 
-while [ ${#} -gt 0 ]; do
-    op="${1}"
-    shift
-    case ${op} in
+while [ true ]; do
+    case ${1} in
         --insider)
             BUILD="insider"
+            shift
             ;;
         --dump-sha)
             DUMP_COMMIT_SHA="yes"
+            shift
             ;;
         --cli)
             BIN_TYPE="cli"
+            shift
             ;;
         --alpine)
             IS_ALPINE=1
+            shift
+            ;;
+        --extensions)
+            EXTENSIONS="${2}"
+            shift 2
             ;;
         -h|--help)
             echo "${usage}"
             exit 0
             ;;
-        --extensions)
-            if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
-                EXTENSIONS="$1"
-                shift
-            else
-                echo "Error: --extensions requires a parameter"
-                exit 1
-            fi
-            ;;
-        -*|--*)
-            echo "Unknown option ${op}"
-            exit 1
-            ;;
-        *)
-            if [ -n "${op}" ]; then
-                case ${op} in
-                    # We can't put Alpine here because the server download required PLATFORM=linux and ARCH=alpine.
-                    alpine|darwin|linux|win32)
-                      PLATFORM="${op}"
-                      ;;
-                    arm64|armhf|x64)
-                      ARCH="${op}"
-                      ;;
-                    *)
-                      echo "Unknown option ${op}"
-                      exit 1
-                      ;;
-                esac
-            fi
-            ;;
+        --) shift; break;;
+        *) echo "unknown option '${1}'"; exit 1;;
     esac
 done
 
 # Platform is required.
-if [ -z "${PLATFORM}" ]; then
-    echo "please specify which platform version of VS Code to install\nacceptable values are win32, linux, darwin, or alpine"
+if [ "$#" -lt 1 ]; then
+    echo "please specify which platform version of VS Code to install\nacceptable values are linux, alpine, win32, or darwin"
     exit 1
 fi
+
+if [ "$#" -lt 2 ]; then
+    echo "missing required architecture argument <ARCH> (arm64|armhf|x64)"
+    exit 1
+fi
+
+case ${1} in
+    # When downloading code server for Alpine, you must pass PLATFORM=linux and ARCH=alpine.
+    # Setting PLATFORM=alpine is OK here for downloading code CLI.
+    alpine|darwin|linux|win32)
+      PLATFORM="${1}"
+      ;;
+esac
+
+case ${2} in
+    arm64|armhf|x64)
+      ARCH="${2}"
+      ;;
+esac
 
 # When non specified, then pull from the OS.
 if [ -z "${ARCH}" ]; then
