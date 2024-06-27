@@ -48,9 +48,10 @@ Options
     Only works when downloading VS Code Server, it will force PLATFORM=linux and
     ARCH=alpine, as the developers deviated from the standard format used for
     all others.
+
 --extensions
-    specify which extensions to install. expects a string of full extension names seperated by commas,
-    e.g ms-vscode.PowerShell,redhat.ansible,ms-python.vscode-pylance
+    specify which extensions to install. expects a string of full extension names seperated by a space,
+    e.g \"ms-vscode.PowerShell redhat.ansible ms-python.vscode-pylance\"
 
 -h, --help
     Print this usage info.
@@ -261,7 +262,11 @@ fi
 echo "VS Code server pre-install completed"
 echo "downloading extensions..."
 
-echo "$EXTENSIONS" | tr ',' '\n' | while IFS= read -r ext; do
-    ~/code-server --install-extension "$ext"
-done
+if [ -n "${EXTENSIONS}" ]; then
+    ## Auto-accept license terms and then install the extensions, by force if they already exist.
+    for extension in ${EXTENSIONS}; do
+        ~/code-server --accept-server-license-terms --force --install-extension "${extension}"
+    done
+fi
+
 echo "extensions installation complete"
