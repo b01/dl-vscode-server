@@ -53,6 +53,10 @@ Options
     specify which extensions to install. expects a string of full extension names seperated by a space,
     e.g \"ms-vscode.PowerShell redhat.ansible ms-python.vscode-pylance\"
 
+--use-commit
+    Download VS ode Server with the provided commit sha. This allows to download the matching VS Code Server for
+    an existing VS Code installation that is not the newest commit version.
+
 -h, --help
     Print this usage info.
 "
@@ -139,7 +143,7 @@ if [ $? -ne 4 ]; then
     exit 1
 fi
 
-LONG_OPTS=help,insider,dump-sha,cli,alpine,extensions:
+LONG_OPTS=help,insider,dump-sha,cli,alpine,extensions:,use-commit:
 OPTIONS=h
 
 PARSED=$(getopt --options=${OPTIONS} --longoptions=${LONG_OPTS} --name "$0" -- "${@}") || exit 1
@@ -151,6 +155,7 @@ BUILD="stable"
 BIN_TYPE="server"
 DUMP_COMMIT_SHA=""
 IS_ALPINE=0
+USE_COMMIT=""
 
 while [ true ]; do
     case ${1} in
@@ -172,6 +177,10 @@ while [ true ]; do
             ;;
         --extensions)
             EXTENSIONS="${2}"
+            shift 2
+            ;;
+        --use-commit)
+            USE_COMMIT="${2}"
             shift 2
             ;;
         -h|--help)
@@ -228,12 +237,15 @@ if [ "${BIN_TYPE}" = "server" -a ${IS_ALPINE} -eq 1 ]; then
     ARCH="alpine" # Alpine is NOT an Arch but a flavor of Linux, oh well.
 fi
 
-# We hard-code this because all but a few options returns a 404.
-commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
-
-if [ -z "${commit_sha}" ]; then
-    echo "could not get the VS Code latest commit sha, exiting"
-    exit 1
+if [ -n "${USE_COMMIT}" ]; then
+    commit_sha="${USE_COMMIT}"
+else
+    # We hard-code this because all but a few options returns a 404.
+    commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
+    if [ -z "${commit_sha}" ]; then
+        echo "could not get the VS Code latest commit sha, exiting"
+        exit 1
+    fi
 fi
 
 if [ "${DUMP_COMMIT_SHA}" = "yes" ]; then
