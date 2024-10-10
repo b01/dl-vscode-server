@@ -35,8 +35,9 @@ curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-
 ### Docker
 
 ```dockerfile
-ADD --chmod=777 \
-    https://raw.githubusercontent.com/b01/dl-vscode-server/updates-2024-05-16-01/download-vs-code.sh \
+DL_VER="0.2.1"
+ADD --chmod=755 \
+    https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${DL_VER}/download-vs-code.sh \
     .
 
 # Install VS Code Server and Requirements
