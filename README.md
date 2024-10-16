@@ -36,9 +36,10 @@ curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-
 
 ```dockerfile
 DL_VER="0.2.1"
-ADD --chmod=755 \
-    https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${DL_VER}/download-vs-code.sh \
-    .
+# Install VS Code Server
+RUN curl -LO https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${DL_VER}/download-vs-code.sh \
+ && chmod +x download-vs-code.sh \
+ && ./download-vs-code.sh "linux" "x64" --extensions "ms-vscode.cpptools"
 
 # Install VS Code Server and Requirements
 RUN ./download-vs-code.sh "linux" "x64" --alpine --extensions dbaeumer.vscode-eslint
