@@ -242,10 +242,11 @@ if [ -n "${USE_COMMIT}" ]; then
 else
     # We hard-code this because all but a few options returns a 404.
     commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
-    if [ -z "${commit_sha}" ]; then
-        echo "could not get the VS Code latest commit sha, exiting"
-        exit 1
-    fi
+fi
+
+if [ -z "${commit_sha}" ]; then
+    echo "could not get the VS Code latest commit sha, exiting"
+    exit 1
 fi
 
 if [ "${DUMP_COMMIT_SHA}" = "yes" ]; then
