@@ -78,7 +78,8 @@ Print this usage info
     specify which extensions to install. expects a string of full extension names seperated by commas,
     e.g ms-vscode.PowerShell,redhat.ansible,ms-python.vscode-pylance
 
-
+`--use-commit`
+    Download VS Code Server/CLI with the provided commit sha. This allows to download the matching VS Code Server for an existing VS Code installation that is not the newest commit version.
 ---
 
 [b01/download-vs-code-server.sh]: https://gist.github.com/b01/0a16b6645ab7921b0910603dfb85e4fb

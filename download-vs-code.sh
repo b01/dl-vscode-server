@@ -54,7 +54,7 @@ Options
     e.g \"ms-vscode.PowerShell redhat.ansible ms-python.vscode-pylance\"
 
 --use-commit
-    Download VS ode Server with the provided commit sha. This allows to download the matching VS Code Server for
+    Download VS Code Server/CLI with the provided commit sha. This allows to download the matching VS Code Server for
     an existing VS Code installation that is not the newest commit version.
 
 -h, --help
