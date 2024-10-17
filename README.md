@@ -39,10 +39,7 @@ DL_VER="0.2.1"
 # Install VS Code Server
 RUN curl -LO https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${DL_VER}/download-vs-code.sh \
  && chmod +x download-vs-code.sh \
- && ./download-vs-code.sh "linux" "x64" --extensions "ms-vscode.cpptools"
-
-# Install VS Code Server and Requirements
-RUN ./download-vs-code.sh "linux" "x64" --alpine --extensions dbaeumer.vscode-eslint
+ && ./download-vs-code.sh "linux" "x64" --extensions dbaeumer.vscode-eslint
 ```
 
 ## How To Use
@@ -51,7 +48,7 @@ RUN ./download-vs-code.sh "linux" "x64" --alpine --extensions dbaeumer.vscode-es
 
 ### Example:
 
-download-vs-code.sh \"linux\" \"x64\" --alpine
+download-vs-code.sh \"linux\" \"x64\" --extensions dbaeumer.vscode-eslint --use-commit 384ff7382de624fb94dbaf6da11977bba1ecd427
 
 ### Options
 
