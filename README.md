@@ -29,7 +29,8 @@ script at [b01/download-vs-code-server.sh]
 
 ### Shell
 ```shell
-curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code-server.sh | bash -s -- "linux"
+curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code-server.sh \
+| bash -s -- "linux"
 ```
 
 ### Docker
@@ -39,7 +40,7 @@ DL_VER="0.2.1"
 # Install VS Code Server
 RUN curl -LO https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${DL_VER}/download-vs-code.sh \
  && chmod +x download-vs-code.sh \
- && ./download-vs-code.sh "linux" "x64" --extensions dbaeumer.vscode-eslint
+ && ./download-vs-code.sh "linux" "x64" --extensions "dbaeumer.vscode-eslint"
 ```
 
 ## How To Use
@@ -48,7 +49,9 @@ RUN curl -LO https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${
 
 ### Example:
 
-download-vs-code.sh \"linux\" \"x64\" --extensions dbaeumer.vscode-eslint --use-commit 384ff7382de624fb94dbaf6da11977bba1ecd427
+```shell
+download-vs-code.sh "linux" "x64" --extensions "dbaeumer.vscode-eslint" --use-commit 384ff7382de624fb94dbaf6da11977bba1ecd427
+```
 
 ### Options
 
@@ -72,11 +75,18 @@ others.
 Print this usage info
 
 `--extensions`
-    specify which extensions to install. expects a string of full extension names seperated by commas,
-    e.g ms-vscode.PowerShell,redhat.ansible,ms-python.vscode-pylance
+    specify which extensions to install. expects a string of full extension names seperated by a space,
+    e.g "ms-vscode.PowerShell redhat.ansible ms-python.vscode-pylance"
+
+   **Example**
+   ```shell
+   download-vs-code.sh "linux" "x64" --extensions "ms-vscode.cpptools ms-vscode.cpptools-extension-pack"
+   ```
+   ![Example depicting how to use the extensions option.](/assets/example-option-extensions-01.png)
 
 `--use-commit`
     Download VS Code Server/CLI with the provided commit sha. This allows to download the matching VS Code Server for an existing VS Code installation that is not the newest commit version.
+
 ---
 
 [b01/download-vs-code-server.sh]: https://gist.github.com/b01/0a16b6645ab7921b0910603dfb85e4fb
