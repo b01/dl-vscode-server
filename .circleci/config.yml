@@ -21,7 +21,7 @@ remote_worker: &remote_worker
     docker_layer_caching: true
 
 orbs:
-  vr: kohirens/version-release@4.2.4
+  vr: kohirens/version-release@5.1.9
 
 parameters:
   alpine_version_file:
@@ -35,10 +35,6 @@ parameters:
     default: b01-automation-dockerhub
     description: Docker Hub context
     type: string
-  ssh_finger:
-    description: SSH fingerprint
-    type: string
-    default: "SHA256:3pwyNuChGDeQkIehoDY41dqHka6EwT6ft13v5KZ02RM"
   triggered_flow:
     default: "workflow-selector"
     description: Workflow to be executed
@@ -134,7 +130,6 @@ workflows:
     jobs:
       - vr/workflow-selector:
           context: << pipeline.parameters.ctx_auto_release >>
-          ssh_finger: << pipeline.parameters.ssh_finger >>
 
   publish-changelog:
     when:
@@ -143,7 +138,8 @@ workflows:
     jobs:
       - vr/publish-changelog:
           context: << pipeline.parameters.ctx_auto_release >>
-          ssh_finger: << pipeline.parameters.ssh_finger >>
+          committer_email: 619281+b01@users.noreply.github.com
+          committer_name: Khalifah K Shabazz
 
   publish-release-tag:
     when:
