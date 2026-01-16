@@ -29,7 +29,7 @@ script at [b01/download-vs-code-server.sh]
 
 ### Shell
 ```shell
-curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code-server.sh \
+curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code.sh \
 | bash -s -- "linux"
 ```
 
