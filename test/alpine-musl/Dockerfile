@@ -5,7 +5,7 @@ ARG USER_GROUP='app_users'
 ARG REPO='githunb.com/b01/dl-vscode-server'
 ARG WD="/home/${USER_NAME}/src/${REPO}/test/alpine-musl"
 
-FROM alpine:3.19
+FROM alpine:3.23
 
 ARG USER_NAME
 ARG USER_UID
