@@ -6,7 +6,7 @@ ARG REPO='githunb.com/b01/dl-vscode-server'
 ARG WD="/home/${USER_NAME}/src/${REPO}/test/debian"
 
 # VS Code, unfortunately, relies on GNU Lib C. So see if we can use Kohirens Alpine GNU LibC image.
-FROM debian:bookworm-slim
+FROM debian:13-slim
 
 ARG USER_NAME
 ARG USER_UID
