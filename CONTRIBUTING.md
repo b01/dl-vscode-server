@@ -3,7 +3,7 @@
 This repository automatically releases when an approved PR is merged. So please
 adhere to these rules for a smooth fast PR approval.
 
-**Rules**S
+**Rules**
 
 * follow the [Commit Message Format] described here. These commits will appear
   in the changelog and MUST be comprehensible by humans. 
