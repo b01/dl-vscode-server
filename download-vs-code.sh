@@ -26,7 +26,10 @@ usage="
 This script downloads a tar of VS Code Server/CLI, then extracts it to a
 location expected by tunnels made by VS Code clients.
 
-download-vs-code.sh [options] <PLATFORM> [<ARCH>]
+download-vs-code.sh [options] <PLATFORM> <ARCH>
+
+NOTE: When downloading code server for Alpine, you must pass
+      PLATFORM=linux and ARCH=alpine.
 
 Example:
   download-vs-code.sh \"linux\" \"x64\" --alpine

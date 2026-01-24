@@ -45,7 +45,7 @@ RUN curl -LO https://raw.githubusercontent.com/b01/dl-vscode-server/refs/tags/${
 
 ## How To Use
 
-`download-vs-code.sh [options] <PLATFORM> [<ARCH>]`
+`download-vs-code.sh [options] <PLATFORM> <ARCH>`
 
 ### Example:
 
